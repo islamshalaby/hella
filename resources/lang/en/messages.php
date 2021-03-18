@@ -397,6 +397,8 @@
         "kg_en" => "K.G/G.M en english",
         "kg_ar" => "K.G/G.M en arabic",
         "kg_en_required" => "K.G/G.M in english is required field",
-        "kg_ar_required" => "K.G/G.M in arabic is required field"
+        "kg_ar_required" => "K.G/G.M in arabic is required field",
+        "ad_place" => "Ad source",
+        "link_type" => "Link Type"
     ];
 ?>

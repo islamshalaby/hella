@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Ad;
 use App\User;
 use App\Product;
+use App\Category;
 
 class AdController extends AdminController{
     
@@ -26,6 +27,7 @@ class AdController extends AdminController{
         $ad = new Ad();
         $ad->image = $image_new_name;
         $ad->content = $request->content;
+        $ad->content_type = $request->content_type;
         $ad->type = $request->type;
         
         $ad->save();
@@ -42,11 +44,11 @@ class AdController extends AdminController{
         // get edit page
         public function EditGet(Request $request){
             $data['ad'] = Ad::find($request->id);
-            if ($data['ad']['type'] == 1) {
-                $data['product'] = Product::findOrFail($data['ad']['content']);
-            }else {
-                $data['product'] = [];
-            }
+            // if ($data['ad']['type'] == 1) {
+            //     $data['product'] = Product::findOrFail($data['ad']['content']);
+            // }else {
+            //     $data['product'] = [];
+            // }
             // dd($data['product']);
             return view('admin.ad_edit' , ['data' => $data]);
         }
@@ -67,7 +69,9 @@ class AdController extends AdminController{
                 $ad->image = $image_new_name;
             }
             $ad->type = $request->type;
-            
+            if (isset($request->content_type)) {
+                $ad->content_type = $request->content_type;
+            }
             $ad->content = $request->content;
             
             $ad->save();
@@ -94,6 +98,13 @@ class AdController extends AdminController{
     
         public function fetch_products() {
             $row = Product::orderBy('id' , 'desc')->get();
+            $data = json_decode($row);
+    
+            return response($data, 200);
+        }
+
+        public function fetch_categories() {
+            $row = Category::where('deleted', 0)->orderBy('id' , 'desc')->get();
             $data = json_decode($row);
     
             return response($data, 200);

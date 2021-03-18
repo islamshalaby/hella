@@ -101,6 +101,7 @@ Route::group([
         Route::get('details/{id}' , 'AdController@details');
         Route::get('delete/{id}' , 'AdController@delete');
         Route::get('fetchproducts' , 'AdController@fetch_products')->name("products.fetch");
+        Route::get('fetchcategories' , 'AdController@fetch_categories')->name("categories.fetch");
     });
 
     // Discount Coupons Route

@@ -11,13 +11,83 @@
                 $('.productsParent').hide()
                 $('select#products').prop("disabled", true)
                 $(".outside input").prop("disabled", false)
+                $("#link_type").parent('.form-group').hide()
+                $("#link_type").prop('disabled', true)
                 $(".inside").hide()
             }else {
                 $(".outside").hide()
                 $(".outside input").prop("disabled", true)
-                $(".inside").show()
+                $("#link_type").parent('.form-group').show()
+                $("#link_type").prop('disabled', false)
                 $('select#products').html("")
+            }
+        })
 
+        @if ($data['ad']['type'] == 1)
+        var contentId = {{ $data['ad']['content'] }}
+            @if($data['ad']['content_type'] == 1)
+                $.ajax({
+                    url : "/admin-panel/ads/fetchproducts",
+                    type : 'GET',
+                    success : function (data) {
+                        $('.productsParent').show()
+                        $('select#products').prop("disabled", false)
+                        $('select#products').siblings('label').text(productSelect)
+                        data.forEach(function (product) {
+                            var productName = product.title_en,
+                                selected = ""
+
+                            if (contentId == product.id) {
+                                selected = 'selected'
+                            }
+                            if (language == 'ar') {
+                                productName = product.title_ar
+                            }
+                            $('select#products').append(
+                                "<option " + selected + " value='" + product.id + "'>" + productName + "</option>"
+                            )
+                        })
+                    }
+                })
+            @endif
+            var itemSelect = {{ $data['ad']['content_type'] }}
+            
+            @if($data['ad']['content_type'] == 2)
+            $.ajax({
+                url : "/admin-panel/ads/fetchcategories/",
+                type : 'GET',
+                success : function (data) {
+                    var content = {{ $data['ad']['content'] }}
+                    $('.productsParent').show()
+                    $('select#products').prop("disabled", false)
+                    $('select#products').siblings('label').text(categorySelect)
+                    data.forEach(function (category) {
+                        var categoryName = category.title_en,
+                            selected = ""
+                        if (language == 'ar') {
+                            categoryName = category.title_ar
+                        }
+                        if (content == category.id) {
+                            selected = "selected"
+                        }
+                        $('select#products').append(
+                            "<option " + selected + " value='" + category.id + "'>" + categoryName + "</option>"
+                        )
+                    })
+                }
+            })
+            @endif
+        @endif
+
+        var language = "{{ Config::get('app.locale') }}",
+            productSelect = "{{ __('messages.product') }}",
+            categorySelect = "{{ __('messages.category') }}"
+
+        $("#link_type").on("change", function() {
+            $(".inside").show()
+            $('select#products').html("")
+            
+            if ($(this).val() == 1) {
                 $.ajax({
                     url : "/admin-panel/ads/fetchproducts",
                     type : 'GET',
@@ -36,42 +106,27 @@
                         })
                     }
                 })
-            }
-        })
-
-        @if ($data['ad']['type'] == 1)
-        $.ajax({
-            url : "/admin-panel/ads/fetchproducts",
-            type : 'GET',
-            success : function (data) {
-                
-                $('.productsParent').show()
-                $('select#products').prop("disabled", false)
-                console.log(data)
-                data.forEach(function (product) {
-                    var productName = product.title_en
-                    if (language == 'ar') {
-                        productName = product.title_ar
+            }else if($(this).val() == 2) {
+                $('select#products').html('')
+                $.ajax({
+                    url : "/admin-panel/ads/fetchcategories",
+                    type : 'GET',
+                    success : function (data) {
+                        console.log(data)
+                        $('.productsParent').show()
+                        $('select#products').prop("disabled", false)
+                        $('select#products').siblings('label').text(categorySelect)
+                        data.forEach(function (category) {
+                            var categoryName = category.title_en
+                            if (language == 'ar') {
+                                categoryName = category.title_ar
+                            }
+                            $('select#products').append(
+                                "<option value='" + category.id + "'>" + categoryName + "</option>"
+                            )
+                        })
                     }
-                    $('select#products').append(
-                        "<option value='" + product.id + "'>" + productName + "</option>"
-                    )
                 })
-            }
-        })
-        @endif
-
-        $("#ad_type").on("change", function() {
-            if(this.value == 2) {
-                $(".outside").show()
-                $('.productsParent').hide()
-                $('select#products').prop("disabled", true)
-                $(".outside input").prop("disabled", false)
-                $(".inside").hide()
-            }else {
-                $(".outside").hide()
-                $(".outside input").prop("disabled", true)
-                $(".inside").show()
             }
         })
     </script>
@@ -111,6 +166,15 @@
                 </select>
             </div>
                    
+            <div style="display: {{ $data['ad']['type'] == 2 ? 'none' : '' }}" class="form-group">
+                <label for="link_type">{{ __('messages.link_type') }}</label>
+                <select {{ $data['ad']['type'] == 2 ? 'disabled' : '' }} id="link_type" name="content_type" class="form-control">
+                    <option selected>{{ __('messages.select') }}</option>
+                    <option {{ $data['ad']['content_type'] == 1 ? 'selected' : '' }} value="1">{{ __('messages.product') }}</option>
+                    <option {{ $data['ad']['content_type'] == 2 ? 'selected' : '' }} value="2">{{ __('messages.category') }}</option>
+                </select>
+            </div> 
+
             <div style="display: {{ $data['ad']['type'] == 1 ? 'none' : '' }}" class="form-group mb-4 outside">
                 <label for="link">{{ __('messages.link') }}</label>
                 <input required type="text" name="content" class="form-control" id="link" placeholder="{{ __('messages.link') }}" value="{{ $data['ad']['content'] }}" >

@@ -4,20 +4,32 @@
 
 @push('scripts')
     <script>
-        
         $("#ad_type").on("change", function() {
             if(this.value == 2) {
                 $(".outside").show()
                 $('.productsParent').hide()
                 $('select#products').prop("disabled", true)
                 $(".outside input").prop("disabled", false)
+                $("#link_type").parent('.form-group').hide()
+                $("#link_type").prop('disabled', true)
                 $(".inside").hide()
             }else {
                 $(".outside").hide()
                 $(".outside input").prop("disabled", true)
-                $(".inside").show()
+                $("#link_type").parent('.form-group').show()
+                $("#link_type").prop('disabled', false)
                 $('select#products').html("")
-                var language = "{{ Config::get('app.locale') }}"
+            }
+        })
+        var language = "{{ Config::get('app.locale') }}",
+            productSelect = "{{ __('messages.product') }}",
+            categorySelect = "{{ __('messages.category') }}"
+
+        $("#link_type").on("change", function() {
+            $(".inside").show()
+            $('select#products').html("")
+            
+            if ($(this).val() == 1) {
                 $.ajax({
                     url : "fetchproducts",
                     type : 'GET',
@@ -32,6 +44,27 @@
                             }
                             $('select#products').append(
                                 "<option value='" + product.id + "'>" + productName + "</option>"
+                            )
+                        })
+                    }
+                })
+            }else if($(this).val() == 2) {
+                $('select#products').html('')
+                $.ajax({
+                    url : "/admin-panel/ads/fetchcategories",
+                    type : 'GET',
+                    success : function (data) {
+                        console.log(data)
+                        $('.productsParent').show()
+                        $('select#products').prop("disabled", false)
+                        $('select#products').siblings('label').text(categorySelect)
+                        data.forEach(function (category) {
+                            var categoryName = category.title_en
+                            if (language == 'ar') {
+                                categoryName = category.title_ar
+                            }
+                            $('select#products').append(
+                                "<option value='" + category.id + "'>" + categoryName + "</option>"
                             )
                         })
                     }
@@ -74,7 +107,14 @@
                 <label for="link">{{ __('messages.link') }}</label>
                 <input required type="text" name="content" class="form-control" id="link" placeholder="{{ __('messages.link') }}" value="" >
             </div>
-
+            <div style="display: none" class="form-group">
+                <label for="link_type">{{ __('messages.link_type') }}</label>
+                <select disabled id="link_type" name="content_type" class="form-control">
+                    <option selected>{{ __('messages.select') }}</option>
+                    <option value="1">{{ __('messages.product') }}</option>
+                    <option value="2">{{ __('messages.category') }}</option>
+                </select>
+            </div> 
             
             <div style="display: none" class="form-group productsParent">
                 <label for="products">{{ __('messages.product') }}</label>

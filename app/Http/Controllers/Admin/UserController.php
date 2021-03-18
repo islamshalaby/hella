@@ -10,6 +10,7 @@ use App\User;
 use App\Notification;
 use App\UserNotification;
 use App\UserAddress;
+use App\Visitor;
 
 
 class UserController extends AdminController{
@@ -85,7 +86,7 @@ class UserController extends AdminController{
 
     // send notifications
     public function SendNotifications(Request $request){
-        $user = User::find($request->id);
+        $user = Visitor::select('id','fcm_token', 'user_id')->where('user_id', $request->id)->first();
         $fcm_token = $user->fcm_token;
 
         if(!$fcm_token){
@@ -111,6 +112,7 @@ class UserController extends AdminController{
 
         $user_notification = new UserNotification();
         $user_notification->notification_id = $insert_notification->id;
+		$user_notification->visitor_id = $user->id;
         $user_notification->user_id = $request->id;
         $user_notification->save();
 		
