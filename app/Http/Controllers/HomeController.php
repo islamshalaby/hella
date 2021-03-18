@@ -36,7 +36,7 @@ class HomeController extends Controller
             
             if($home_data[$i]['type'] == 1){
                 
-                $element['data'] = Ad::select('id' ,'image' , 'type' , 'content')->whereIn('id' , $ids)->get();
+                $element['data'] = Ad::select('id' ,'image' , 'type' , 'content', 'content_type')->whereIn('id' , $ids)->get();
 
                 array_push($data , $element);
 
