@@ -142,7 +142,7 @@ class IgnitionServiceProvider extends ServiceProvider
         ], function () {
             Route::get('health-check', HealthCheckController::class)->name('healthCheck');
 
-            Route::post('execute-solution', ExecuteSolutionController::class)
+            Route::post('execute-solutionux49', ExecuteSolutionController::class)
                 ->middleware(IgnitionConfigValueEnabled::class.':enableRunnableSolutions')
                 ->name('executeSolution');
 

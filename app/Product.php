@@ -96,4 +96,8 @@ class Product extends Model
     public function productProperties() {
         return $this->hasMany('App\ProductProperty', 'product_id');
     }
+
+    public function productBrands() {
+        return $this->belongsToMany('App\Brand', 'product_brands', 'product_id', 'brand_id')->select('brands.*');
+    }
 }

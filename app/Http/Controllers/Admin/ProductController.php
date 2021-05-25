@@ -65,6 +65,8 @@ class ProductController extends AdminController{
     // edit get
     public function EditGet(Product $product) {
         $data['product'] = $product;
+        $data['productPrands'] = $product->productBrands()->pluck('id')->toArray();
+        // dd($data['productPrands']);
         $data['barcode'] = uniqid();
         // dd($product);
         $data['categories'] = Category::where('deleted', 0)->orderBy('id', 'desc')->get();
@@ -409,7 +411,7 @@ class ProductController extends AdminController{
             // 'remaining_quantity' => 'required|numeric|lt:' . $total_quantity,
             'weight' => 'required'
         ]);
-        $product_post = $request->except(['images', 'option', 'value_en', 'value_ar', 'home_section', 'total_quatity', 'remaining_quantity', 'final_price', 'total_amount', 'remaining_amount', 'price_after_discount', 'barcodes', 'stored_numbers']);
+        $product_post = $request->except(['images', 'option', 'value_en', 'value_ar', 'home_section', 'total_quatity', 'remaining_quantity', 'final_price', 'total_amount', 'remaining_amount', 'price_after_discount', 'barcodes', 'stored_numbers', 'brand_id', 'sub_two_category_id']);
         
         if (isset($product_post['offer'])) {
             $price_before = number_format((float)$product_post['price_before_offer'], 3, '.', '');
@@ -430,10 +432,12 @@ class ProductController extends AdminController{
             $product_post['offer_percentage'] = 0;
             $product_post['price_before_offer'] = 0;
         }
-        
-        
-        
+        // dd($product_post);
         $createdProduct = Product::create($product_post);
+
+        if ($request->brand_id && count($request->brand_id) > 0) {
+            $createdProduct->productBrands()->sync($request->brand_id);
+        }
 
         if (isset($request->home_section)) {
             HomeElement::create(['home_id' => $request->home_section, 'element_id' => $createdProduct['id']]);

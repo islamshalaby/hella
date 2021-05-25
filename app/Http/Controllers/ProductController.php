@@ -21,7 +21,7 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api' , ['except' => ['getdetails' , 'getproducts' , 'getbrandproducts']]);
+        $this->middleware('auth:api' , ['except' => ['getdetails' , 'getproducts' , 'getbrandproducts', 'fetchBrandProducts', 'fetchCategoryProducts']]);
     }
 
 
@@ -33,7 +33,7 @@ class ProductController extends Controller
                 $multi_options = [];
                 $multi_options['option_name'] = $data['product']->mOptions[0]['title_en'];
                 $multi_options['option_values'] = $data['product']->mOptionsValuesEn;
-                // dd($multi_options['option_values']);
+                
                 for($k = 0; $k < count($multi_options["option_values"]); $k ++) {
                     $product_m_option = ProductMultiOption::select('final_price', 'price_before_offer', 'total_quatity', 'remaining_quantity', 'barcode', 'stored_number', 'multi_option_value_id as option_value_id', 'product_multi_options.id as option_id')->where('product_id', $data['product']['id'])->where('remaining_quantity', '>', 0)->where('multi_option_value_id', $multi_options["option_values"][$k]['option_value_id'])->first();
                     $multi_options["option_values"][$k]['option_data'] = $product_m_option;
@@ -86,9 +86,9 @@ class ProductController extends Controller
         $data['product']['options'] = $product_options;
         
         if($request->lang == 'en'){
-            $data['related'] = Product::select('id', 'title_en as title' , 'final_price' , 'price_before_offer' , 'weight' ,'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_en as kg' )->where('deleted' , 0)->where('category_id' , $data['product']['category_id'])->where('id' , '!=' , $data['product']['id'])->get()->makeHidden(['mOptions', 'mOptionsValuesEn', 'mOptionsValuesAr', 'multiOptions']);
+            $data['related'] = Product::select('id', 'title_en as title' , 'final_price' , 'price_before_offer' , 'weight' ,'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_en as kg' )->where('deleted' , 0)->where('category_id' , $data['product']['category_id'])->where('id' , '!=' , $data['product']['id'])->inRandomOrder()->limit(5)->makeHidden(['mOptions', 'mOptionsValuesEn', 'mOptionsValuesAr', 'multiOptions']);
         }else{
-            $data['related'] = Product::select('id', 'title_ar as title' , 'final_price' , 'price_before_offer' , 'weight' , 'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_ar as kg')->where('deleted' , 0)->where('category_id' , $data['product']['category_id'])->where('id' , '!=' , $data['product']['id'])->get()->makeHidden(['mOptions', 'mOptionsValuesEn', 'mOptionsValuesAr', 'multiOptions']);
+            $data['related'] = Product::select('id', 'title_ar as title' , 'final_price' , 'price_before_offer' , 'weight' , 'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_ar as kg')->where('deleted' , 0)->where('category_id' , $data['product']['category_id'])->where('id' , '!=' , $data['product']['id'])->inRandomOrder()->limit(5)->makeHidden(['mOptions', 'mOptionsValuesEn', 'mOptionsValuesAr', 'multiOptions']);
         }
         
         for($j = 0; $j < count($data['related']) ; $j++){
@@ -272,6 +272,116 @@ class ProductController extends Controller
         }
         
         $data['products'] = $products;
+        $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $data , $request->lang);
+        return response()->json($response , 200);
+    }
+
+    public function fetchBrandProducts(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'category_id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'Missing Required Fields' , 'بعض الحقول مفقودة' , null , $request->lang);
+            return response()->json($response , 406);
+        }
+
+        $data['products'] = Product::
+        select('id', 'title_' . $request->lang . ' as title' , 'final_price' , 'price_before_offer' , 'weight' , 'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_en as kg' )
+        ->where('deleted' , 0)
+        ->where('hidden' , 0)
+        ->where('remaining_quantity', '>', 0)
+        ->whereHas('productBrands', function($q) use ($request) {
+            $q->where('brands.id', $request->brand_id);
+        });
+
+        $brandCategories = $data['products']->pluck('category_id')->toArray();
+
+        $data['categories'] = Category::where('deleted', 0)->whereIn('id', $brandCategories)->select("id", "title_" . $request->lang . " as title")->get()->toArray();
+        $all = "All";
+        if ($request->lang == 'ar') {
+            $all = "الكل";
+        }
+        $allObj = [
+            "id" => 0,
+            "title" => $all,
+            "selected" => false
+        ];
+        
+
+        array_unshift($data['categories'], $allObj);
+
+        for ($i = 0; $i < count($data['categories']); $i ++) {
+            // dd($data['categories'][0]);
+            if ($request->category_id == $data['categories'][$i]['id']) {
+                $data['categories'][$i]['selected'] = true;
+            }else {
+                $data['categories'][$i]['selected'] = false;
+            }
+        }
+        
+        
+        if ($request->category_id != 0) {
+            $data['products'] = $data['products']->where('category_id' , $request->category_id);
+        }
+
+        $data['products'] = $data['products']->simplePaginate(16);
+
+
+        $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $data , $request->lang);
+        return response()->json($response , 200);
+    }
+
+    public function fetchCategoryProducts(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'sub_category_id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'Missing Required Fields' , 'بعض الحقول مفقودة' , null , $request->lang);
+            return response()->json($response , 406);
+        }
+
+        $data['products'] = Product::
+        select('id', 'title_' . $request->lang . ' as title' , 'final_price' , 'price_before_offer' , 'weight' , 'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_en as kg', 'sub_category_id' )
+        ->where('deleted' , 0)
+        ->where('hidden' , 0)
+        ->where('remaining_quantity', '>', 0)
+        ->where('category_id', $request->category_id);
+
+        $categorySubCategories = $data['products']->pluck('sub_category_id')->toArray();
+
+
+        $data['sub_categories'] = SubCategory::where('deleted' , 0)->whereIn('id', $categorySubCategories)->where('category_id' , $request->category_id)->select('id' , 'title_en as title' , 'image')->get()->toArray();
+
+        $all = "All";
+
+        if ($request->lang == 'ar') {
+            $all = "الكل";
+        }
+
+        $allObj = [
+            "id" => 0,
+            "title" => $all,
+            "selected" => false
+        ];
+
+        array_unshift($data['sub_categories'], $allObj);
+
+        for ($i = 0; $i < count($data['sub_categories']); $i ++) {
+            if ($request->sub_category_id == $data['sub_categories'][$i]['id']) {
+                $data['sub_categories'][$i]['selected'] = true;
+            }else {
+                $data['sub_categories'][$i]['selected'] = false;
+            }
+        }
+        if ($request->sub_category_id != 0) {
+            $data['products'] = $data['products']->where('sub_category_id', $request->sub_category_id);
+        }
+
+        $data['products'] = $data['products']->simplePaginate(16);
+
+
         $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $data , $request->lang);
         return response()->json($response , 200);
     }

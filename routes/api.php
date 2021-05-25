@@ -130,6 +130,12 @@ Route::get('/getwhatsappnumber/{lang}/{v}' , 'SettingController@getwhatsapp')->m
 Route::get('/products/{lang}/{v}' , 'ProductController@getproducts')->middleware('checkguest');
 
 // get products brand
+Route::get('/brand-products/{brand_id}/{lang}/{v}' , 'ProductController@fetchBrandProducts')->middleware('checkguest');
+
+// get products brand
+Route::get('/category-products/{category_id}/{lang}/{v}' , 'ProductController@fetchCategoryProducts')->middleware('checkguest');
+
+// get products brand
 Route::get('/products/brand/{brand_id}/{lang}/{v}' , 'ProductController@getbrandproducts')->middleware('checkguest');
 
 // get product details

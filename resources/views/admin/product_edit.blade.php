@@ -1,7 +1,28 @@
 @extends('admin.app')
 
 @section('title' , __('messages.product_edit'))
+@push('styles')
+<style>
+    .wizard > .content > .body .select2-search input {
+        border : none
+    }
+    input[disabled] {
+        background-color: #eeeeee !important;
+    }
+    input[name="final_price[]"],
+    input[name="total_amount[]"],
+    input[name="remaining_amount[]"],
+    input[name="barcodes[]"],
+    input[name="stored_numbers[]"],
+    input[disabled] {
+        font-size: 10px
+    }
 
+    #properties-items .col-sm-5 {
+        margin-bottom: 20px
+    }
+</style>
+@endpush
 @push('scripts')
     <script>
         var language = "{{ Config::get('app.locale') }}",
@@ -623,7 +644,7 @@
                     kgEnInput = $('input[name="kg_en"]').val(),
                     kgEnRequired = "{{ __('messages.kg_en_required') }}"
 
-                if (categorySelect > 0 && subCategorySelect > 0 && subCategory2Select > 0 && weightInput > 0 && numbersInput > 0  && titleEnInput.length > 0 && titleArInput.length > 0 && descriptionEnText.length > 0 && descriptionArText.length > 0&& kgArInput.length > 0 && kgEnInput.length > 0) {
+                if (categorySelect > 0 && subCategorySelect > 0 && weightInput > 0 && numbersInput > 0  && titleEnInput.length > 0 && titleArInput.length > 0 && descriptionEnText.length > 0 && descriptionArText.length > 0&& kgArInput.length > 0 && kgEnInput.length > 0) {
                     $(this).attr('href', '#next')
                     $(this).addClass('next2')
                     
@@ -1719,10 +1740,10 @@
                             </div>
                             <div class="form-group">
                                 <label for="brand">{{ __('messages.brand') }}</label>
-                                <select name="brand_id" class="form-control brand">
-                                    <option value="0" selected>{{ __('messages.select') }}</option>
+                                <select name="brand_id" multiple class="form-control multi_tags brand">
+                                    {{-- <option value="0" selected>{{ __('messages.select') }}</option> --}}
                                     @foreach ( $data['brands'] as $brand )
-                                    <option {{ isset($data['product']['brand_id']) && $data['product']['brand_id'] == $brand->id ? 'selected' : '' }} value="{{ $brand->id }}">{{ App::isLocale('en') ? $brand->title_en : $brand->title_ar }}</option>
+                                    <option {{ in_array($brand->id, $data['productPrands']) ? 'selected' : '' }} value="{{ $brand->id }}">{{ App::isLocale('en') ? $brand->title_en : $brand->title_ar }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -1742,10 +1763,10 @@
                                 </select>
                             </div>
 
-                             <div class="form-group">
+                             <div style="display:none" class="form-group">
                                 <label for="sub_categories_two">{{ __('messages.sub_categories_two') }} *</label>
                                 <select id="sub_category_two" name="sub_two_category_id" class="form-control">
-                                    <option disabled selected>{{ __('messages.select') }}</option>
+                                    <option value="0" selected>{{ __('messages.select') }}</option>
                                     @foreach ( $data['sub_two_category'] as $category )
                                     <option {{ $data['product']['sub_two_category_id'] == $category->id ? 'selected' : '' }} value="{{$category->id }}" >{{$category->title_ar }}</option>
                                     @endforeach
