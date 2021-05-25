@@ -86,9 +86,9 @@ class ProductController extends Controller
         $data['product']['options'] = $product_options;
         
         if($request->lang == 'en'){
-            $data['related'] = Product::select('id', 'title_en as title' , 'final_price' , 'price_before_offer' , 'weight' ,'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_en as kg' )->where('deleted' , 0)->where('category_id' , $data['product']['category_id'])->where('id' , '!=' , $data['product']['id'])->inRandomOrder()->limit(5)->makeHidden(['mOptions', 'mOptionsValuesEn', 'mOptionsValuesAr', 'multiOptions']);
+            $data['related'] = Product::select('id', 'title_en as title' , 'final_price' , 'price_before_offer' , 'weight' ,'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_en as kg' )->where('deleted' , 0)->where('category_id' , $data['product']['category_id'])->where('id' , '!=' , $data['product']['id'])->get()->makeHidden(['mOptions', 'mOptionsValuesEn', 'mOptionsValuesAr', 'multiOptions']);
         }else{
-            $data['related'] = Product::select('id', 'title_ar as title' , 'final_price' , 'price_before_offer' , 'weight' , 'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_ar as kg')->where('deleted' , 0)->where('category_id' , $data['product']['category_id'])->where('id' , '!=' , $data['product']['id'])->inRandomOrder()->limit(5)->makeHidden(['mOptions', 'mOptionsValuesEn', 'mOptionsValuesAr', 'multiOptions']);
+            $data['related'] = Product::select('id', 'title_ar as title' , 'final_price' , 'price_before_offer' , 'weight' , 'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_ar as kg')->where('deleted' , 0)->where('category_id' , $data['product']['category_id'])->where('id' , '!=' , $data['product']['id'])->get()->makeHidden(['mOptions', 'mOptionsValuesEn', 'mOptionsValuesAr', 'multiOptions']);
         }
         
         for($j = 0; $j < count($data['related']) ; $j++){
