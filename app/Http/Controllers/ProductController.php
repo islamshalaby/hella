@@ -326,6 +326,7 @@ class ProductController extends Controller
         }
 
         $products = $products->simplePaginate(16);
+        $products->makeHidden(['multiOptions']);
 
         for($i = 0; $i < count($products); $i++){
             if ($products[$i]['multi_options'] == 1) {
@@ -413,6 +414,7 @@ class ProductController extends Controller
         }
 
         $products = $products->simplePaginate(16);
+        $products->makeHidden(['multiOptions']);
 
         for($i = 0; $i < count($products); $i++){
             if ($products[$i]['multi_options'] == 1) {
