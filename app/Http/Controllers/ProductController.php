@@ -286,7 +286,7 @@ class ProductController extends Controller
             return response()->json($response , 406);
         }
 
-        $data['products'] = Product::
+        $products = Product::
         select('id', 'title_' . $request->lang . ' as title' , 'final_price' , 'price_before_offer' , 'weight' , 'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_en as kg' )
         ->where('deleted' , 0)
         ->where('hidden' , 0)
@@ -295,7 +295,7 @@ class ProductController extends Controller
             $q->where('brands.id', $request->brand_id);
         });
 
-        $brandCategories = $data['products']->pluck('category_id')->toArray();
+        $brandCategories = $products->pluck('category_id')->toArray();
 
         $data['categories'] = Category::where('deleted', 0)->whereIn('id', $brandCategories)->select("id", "title_" . $request->lang . " as title")->get()->toArray();
         $all = "All";
@@ -322,10 +322,43 @@ class ProductController extends Controller
         
         
         if ($request->category_id != 0) {
-            $data['products'] = $data['products']->where('category_id' , $request->category_id);
+            $products = $products->where('category_id' , $request->category_id);
         }
 
-        $data['products'] = $data['products']->simplePaginate(16);
+        $products = $products->simplePaginate(16);
+
+        for($i = 0; $i < count($products); $i++){
+            if ($products[$i]['multi_options'] == 1) {
+                if (count($products[$i]['multiOptions']) > 0) {
+                    $products[$i]['final_price'] = $products[$i]['multiOptions'][0]['final_price'];
+                    $products[$i]['price_before_offer'] = $products[$i]['multiOptions'][0]['price_before_offer'];
+                    unset($products[$i]['multi_options']);
+                }
+            }
+            if(auth()->user()){
+                $user_id = auth()->user()->id;
+
+                $prevfavorite = Favorite::where('product_id' , $products[$i]['id'])->where('user_id' , $user_id)->first();
+                if($prevfavorite){
+                    $products[$i]['favorite'] = true;
+                }else{
+                    $products[$i]['favorite'] = false;
+                }
+
+            }else{
+                $products[$i]['favorite'] = false;
+            }
+
+            if($request->lang == 'en'){
+                $products[$i]['category_name'] = Category::where('id' , $products[$i]['category_id'])->pluck('title_en as title')->first();
+            }else{
+                $products[$i]['category_name'] = Category::where('id' , $products[$i]['category_id'])->pluck('title_ar as title')->first();
+            }
+            
+            $products[$i]['image'] = ProductImage::where('product_id' , $products[$i]['id'])->pluck('image')->first();
+        }
+
+        $data['products'] = $products;
 
 
         $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $data , $request->lang);
@@ -342,14 +375,14 @@ class ProductController extends Controller
             return response()->json($response , 406);
         }
 
-        $data['products'] = Product::
+        $products = Product::
         select('id', 'title_' . $request->lang . ' as title' , 'final_price' , 'price_before_offer' , 'weight' , 'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_en as kg', 'sub_category_id' )
         ->where('deleted' , 0)
         ->where('hidden' , 0)
         ->where('remaining_quantity', '>', 0)
         ->where('category_id', $request->category_id);
 
-        $categorySubCategories = $data['products']->pluck('sub_category_id')->toArray();
+        $categorySubCategories = $products->pluck('sub_category_id')->toArray();
 
 
         $data['sub_categories'] = SubCategory::where('deleted' , 0)->whereIn('id', $categorySubCategories)->where('category_id' , $request->category_id)->select('id' , 'title_en as title' , 'image')->get()->toArray();
@@ -376,10 +409,43 @@ class ProductController extends Controller
             }
         }
         if ($request->sub_category_id != 0) {
-            $data['products'] = $data['products']->where('sub_category_id', $request->sub_category_id);
+            $products = $products->where('sub_category_id', $request->sub_category_id);
         }
 
-        $data['products'] = $data['products']->simplePaginate(16);
+        $products = $products->simplePaginate(16);
+
+        for($i = 0; $i < count($products); $i++){
+            if ($products[$i]['multi_options'] == 1) {
+                if (count($products[$i]['multiOptions']) > 0) {
+                    $products[$i]['final_price'] = $products[$i]['multiOptions'][0]['final_price'];
+                    $products[$i]['price_before_offer'] = $products[$i]['multiOptions'][0]['price_before_offer'];
+                    unset($products[$i]['multi_options']);
+                }
+            }
+            if(auth()->user()){
+                $user_id = auth()->user()->id;
+
+                $prevfavorite = Favorite::where('product_id' , $products[$i]['id'])->where('user_id' , $user_id)->first();
+                if($prevfavorite){
+                    $products[$i]['favorite'] = true;
+                }else{
+                    $products[$i]['favorite'] = false;
+                }
+
+            }else{
+                $products[$i]['favorite'] = false;
+            }
+
+            if($request->lang == 'en'){
+                $products[$i]['category_name'] = Category::where('id' , $products[$i]['category_id'])->pluck('title_en as title')->first();
+            }else{
+                $products[$i]['category_name'] = Category::where('id' , $products[$i]['category_id'])->pluck('title_ar as title')->first();
+            }
+            
+            $products[$i]['image'] = ProductImage::where('product_id' , $products[$i]['id'])->pluck('image')->first();
+        }
+
+        $data['products'] = $products;
 
 
         $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $data , $request->lang);
