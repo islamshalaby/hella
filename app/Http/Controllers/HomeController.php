@@ -40,6 +40,13 @@ class HomeController extends Controller
 
                 array_push($data , $element);
 
+                for ($u = 0; $u < count($element['data']); $u ++) {
+                    if ($element['data'][$u]['content_type'] == 2) {
+                        $category = Category::where('id', $element['data'][$u]['content'])->select('id', 'title_' . $request->lang . ' as title')->first();
+                        $element['data'][$u]['title'] = $category['title'];
+                    }
+                }
+
             }elseif($home_data[$i]['type'] == 2){
                 
                 if($request->lang == 'en'){
@@ -49,6 +56,8 @@ class HomeController extends Controller
                 }
 
                 array_push($data , $element);
+
+                
 
             }elseif($home_data[$i]['type'] == 3){
 

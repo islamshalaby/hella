@@ -33,9 +33,16 @@ class OfferController extends Controller
             $ids = HomeElement::where('home_id' , $home_data[$i]['id'])->pluck('element_id');
             if($home_data[$i]['type'] == 1){
                 
-                $ads = Ad::select('id' ,'image' , 'type' , 'content')->whereIn('id' , $ids)->get();
+                $ads = Ad::select('id' ,'image' , 'type' , 'content', 'content_type')->whereIn('id' , $ids)->get();
 
-                // array_push($ads , $ad);
+                for ($k = 0; $k < count($ads); $k ++) {
+                    if ($ads[$k]['content_type'] == 2) {
+                        $category = Category::where('id', $ads[$k]['content'])->select('id', 'title_' . $request->lang . ' as title')->first();
+                        // var_dump($category);
+                        $ads[$k]['title'] = $category['title'];
+                    }
+                    
+                }
 
             }
         }
