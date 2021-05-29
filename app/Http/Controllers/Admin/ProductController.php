@@ -124,6 +124,10 @@ class ProductController extends AdminController{
             $product_post['brand_id'] = 0;
         }
 
+        if ($request->brand_id && count($request->brand_id) > 0) {
+            $product->productBrands()->sync($request->brand_id);
+        }
+
         if (isset($request->home_section) && !empty($request->home_section)) {
             $data['Home_sections_ids'] = HomeSection::where('type', 4)->pluck('id')->toArray();
             $data['elements'] = HomeElement::where('element_id', $product->id)->whereIn('home_id', $data['Home_sections_ids'])->select('id')->first();
