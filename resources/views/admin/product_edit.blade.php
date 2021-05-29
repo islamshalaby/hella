@@ -1740,7 +1740,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="brand">{{ __('messages.brand') }}</label>
-                                <select name="brand_id" multiple class="form-control multi_tags brand">
+                                <select name="brand_id[]" multiple class="form-control multi_tags brand">
                                     {{-- <option value="0" selected>{{ __('messages.select') }}</option> --}}
                                     @foreach ( $data['brands'] as $brand )
                                     <option {{ in_array($brand->id, $data['productPrands']) ? 'selected' : '' }} value="{{ $brand->id }}">{{ App::isLocale('en') ? $brand->title_en : $brand->title_ar }}</option>
