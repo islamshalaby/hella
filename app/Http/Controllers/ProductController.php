@@ -286,6 +286,13 @@ class ProductController extends Controller
             return response()->json($response , 406);
         }
 
+        $brand = Brand::where('id', $request->brand_id)->select('cover_image')->first();
+        $data['cover_image'] = "";
+
+        if ($brand['cover_image']) {
+            $data['cover_image'] = $brand['cover_image'];
+        }
+
         $products = Product::
         select('id', 'title_' . $request->lang . ' as title' , 'final_price' , 'price_before_offer' , 'weight' , 'offer' , 'offer_percentage' , 'category_id', 'multi_options', 'numbers', 'kg_en as kg' )
         ->where('deleted' , 0)
