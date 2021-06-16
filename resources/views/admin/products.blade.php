@@ -22,9 +22,10 @@
             select = "{{ __('messages.select') }}",
             details = "{{ __('messages.details') }}",
             edit = "{{ __('messages.edit') }}",
-            delte = "{{ __('messages.delete') }}"
+            delte = "{{ __('messages.delete') }}",
+            startFrom = "{{ __('messages.start_from') }}"
+
         $("#category").on("change", function () {
-            console.log("test2")
             var categoryId = $(this).val()
             
 
@@ -37,7 +38,6 @@
                     var i = 1
                     
                     data.forEach(function(element) {
-                        console.log(element)
                         var elementName = element.title_en,
                             cat = element.category.title_en
                         if (language == 'ar') {
@@ -53,7 +53,23 @@
                             dinar = "{{ __('messages.dinar') }}",
                             visibilityStatus = "{{ __('messages.visible') }}",
                             hideShoProduct = "{{ __('messages.hide_product') }}",
-                            hideShowLink = "/admin-panel/products/hide/" + element.id + "/" + 1
+                            hideShowLink = "/admin-panel/products/hide/" + element.id + "/" + 1,
+                            priceBeforeOffer = element.final_price,
+                            finalPrice = element.final_price
+
+                            if (element.multi_options == 0) {
+                                if (element.offer == 1) {
+                                    priceBeforeOffer = element.price_before_offer
+                                }
+                            }else {
+                                if (element.offer == 1) {
+                                    priceBeforeOffer = `${startFrom} ${element.mptions[0].price_before_offer}`
+                                }else {
+                                    priceBeforeOffer = `${startFrom} ${element.mptions[0].final_price}`
+                                }
+                                finalPrice = `${startFrom} ${element.mptions[0].final_price}`
+                            }
+                            
 
                             if (element.hidden == 1) {
                                 hideShoProduct = "{{ __('messages.show_product') }}"
@@ -68,17 +84,17 @@
                         permition[2] = `<a class="dropdown-item" onclick='return confirm("{{ __('messages.are_you_sure') }}");' href="${hideShowLink}">${hideShoProduct}</a>`
                         @endif
                         $("#html5-extension tbody").parent('.form-group').show()
-                        console.log("before")
+                        
                         var rowNode = dTbls.row.add( [
                             `${i}`,
-                            `<img src="https://res.cloudinary.com/dzqo7w4cp/image/upload/w_50,q_50/v1581928924/${ (element.images[0].image) ? element.images[0].image : '' }"  />`,
+                            `<img src="https://res.cloudinary.com/dzqo7w4cp/image/upload/w_50,q_50/v1581928924/${ (element.images[0]) ? element.images[0].image : '' }"  />`,
                             `${elementName}`,
                             `${cat}`,
                             `${element.total_quatity}`,
                             `${element.remaining_quantity}`,
                             `${element.sold_count}`,
-                            `${element.price_before_offer} ${dinar}`,
-                            `${element.final_price} ${dinar}`,
+                            `${priceBeforeOffer} ${dinar}`,
+                            `${finalPrice} ${dinar}`,
                             `${element.updated_at}`,
                             `${element.barcode}`,
                             `<td class="hide_col">
@@ -161,7 +177,22 @@
                             dinar = "{{ __('messages.dinar') }}",
                             visibilityStatus = "{{ __('messages.visible') }}",
                             hideShoProduct = "{{ __('messages.hide_product') }}",
-                            hideShowLink = "/admin-panel/products/hide/" + element.id + "/" + 1
+                            hideShowLink = "/admin-panel/products/hide/" + element.id + "/" + 1,
+                            priceBeforeOffer = element.final_price,
+                            finalPrice = element.final_price
+
+                            if (element.multi_options == 0) {
+                                if (element.offer == 1) {
+                                    priceBeforeOffer = element.price_before_offer
+                                }
+                            }else {
+                                if (element.offer == 1) {
+                                    priceBeforeOffer = `${startFrom} ${element.mptions[0].price_before_offer}`
+                                }else {
+                                    priceBeforeOffer = `${startFrom} ${element.mptions[0].final_price}`
+                                }
+                                finalPrice = `${startFrom} ${element.mptions[0].final_price}`
+                            }
 
                             if (element.hidden == 1) {
                                 hideShoProduct = "{{ __('messages.show_product') }}"
@@ -185,8 +216,8 @@
                             `${element.total_quatity}`,
                             `${element.remaining_quantity}`,
                             `${element.sold_count}`,
-                            `${element.price_before_offer} ${dinar}`,
-                            `${element.final_price} ${dinar}`,
+                            `${priceBeforeOffer} ${dinar}`,
+                            `${finalPrice} ${dinar}`,
                             `${element.updated_at}`,
                             `${element.barcode}`,
                             `<td class="hide_col">
@@ -243,7 +274,22 @@
                             dinar = "{{ __('messages.dinar') }}",
                             visibilityStatus = "{{ __('messages.visible') }}",
                             hideShoProduct = "{{ __('messages.hide_product') }}",
-                            hideShowLink = "/admin-panel/products/hide/" + element.id + "/" + 1
+                            hideShowLink = "/admin-panel/products/hide/" + element.id + "/" + 1,
+                            priceBeforeOffer = element.final_price,
+                            finalPrice = element.final_price
+
+                            if (element.multi_options == 0) {
+                                if (element.offer == 1) {
+                                    priceBeforeOffer = element.price_before_offer
+                                }
+                            }else {
+                                if (element.offer == 1) {
+                                    priceBeforeOffer = `${startFrom} ${element.mptions[0].price_before_offer}`
+                                }else {
+                                    priceBeforeOffer = `${startFrom} ${element.mptions[0].final_price}`
+                                }
+                                finalPrice = `${startFrom} ${element.mptions[0].final_price}`
+                            }
 
                             if (element.hidden == 1) {
                                 hideShoProduct = "{{ __('messages.show_product') }}"
@@ -268,8 +314,8 @@
                             `${element.total_quatity}`,
                             `${element.remaining_quantity}`,
                             `${element.sold_count}`,
-                            `${element.price_before_offer} ${dinar}`,
-                            `${element.final_price} ${dinar}`,
+                            `${priceBeforeOffer} ${dinar}`,
+                            `${finalPrice} ${dinar}`,
                             `${element.updated_at}`,
                             `${element.barcode}`,
                             `<td class="hide_col">

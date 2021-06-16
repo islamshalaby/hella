@@ -17,6 +17,7 @@ use App\ProductMultiOption;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\APIHelpers;
+use Carbon\Carbon;
 
 
 class OrderController extends Controller
@@ -27,6 +28,16 @@ class OrderController extends Controller
     }
     
     public function create(Request $request){
+        $now = Carbon::now();
+        $lastOrder = Order::orderBy('id', 'desc')->first();
+        $orderNumber = $now->year . $now->month . $now->day . "01";
+        if ($lastOrder) {
+            $subSOrder = (int)$lastOrder->id + 1;
+            if ($subSOrder < 9) {
+                $subSOrder = '0' . $subSOrder;
+            }
+            $orderNumber = $now->year . $now->month . $now->day . $subSOrder;
+        }
         $validator = Validator::make($request->all(), [
             'unique_id' => 'required',
             'address_id' => 'required',
@@ -66,7 +77,7 @@ class OrderController extends Controller
             }
             if($request->payment_method == 2 || $request->payment_method == 3){
                 $product->remaining_quantity = $product->remaining_quantity - $cart[$i]['count'];
-                // return $product->remaining_quantity ;
+                
                 $product->save();
                 if ($cart[$i]['option_id'] != 0) {
                     for ($n = 0; $n < count($product->multiOptions); $n ++) {
@@ -122,7 +133,7 @@ class OrderController extends Controller
         $order->total_price = $total_price;
         $order->discount = $discount;
         $order->discount_value = $discount_value;
-        $order->order_number = substr(time() , -7);
+        $order->order_number = $orderNumber;
         $order->save();
 
         for($i = 0; $i < count($cart); $i++){
@@ -209,6 +220,16 @@ class OrderController extends Controller
 
 
     public function excute_pay(Request $request){
+        $now = Carbon::now();
+        $lastOrder = Order::orderBy('id', 'desc')->first();
+        $orderNumber = $now->year . $now->month . $now->day . "01";
+        if ($lastOrder) {
+            $subSOrder = (int)$lastOrder->id + 1;
+            if ($subSOrder < 9) {
+                $subSOrder = '0' . $subSOrder;
+            }
+            $orderNumber = $now->year . $now->month . $now->day . $subSOrder;
+        }
         $user = User::find($request->user_id);
         $user_id = $user->id;
         $visitor  = Visitor::where('unique_id' , $request->unique_id)->first();
@@ -275,7 +296,7 @@ class OrderController extends Controller
         $order->total_price = $total_price;
         $order->discount = $discount;
         $order->discount_value = $discount_value;
-        $order->order_number = substr(time() , -7);
+        $order->order_number = $orderNumber;
         $order->save();
 
         for($i = 0; $i < count($cart); $i++){

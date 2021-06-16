@@ -93,6 +93,10 @@ class Product extends Model
         return $this->hasMany('App\ProductMultiOption', 'product_id');
     }
 
+    public function mptions() {
+        return $this->hasMany('App\ProductMultiOption', 'product_id');
+    }
+
     public function productProperties() {
         return $this->hasMany('App\ProductProperty', 'product_id');
     }

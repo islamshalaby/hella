@@ -56,7 +56,7 @@ class ProductController extends AdminController{
 
     // fetch sub category products
     public function sub_category_products(SubCategory $subCategory) {
-        $rows = Product::where('sub_category_id', $subCategory->id)->with('images', 'category')->get();
+        $rows = Product::where('sub_category_id', $subCategory->id)->with('images', 'category', 'mptions')->get();
         $data = json_decode(($rows));
 
         return response($data, 200);
@@ -124,9 +124,7 @@ class ProductController extends AdminController{
             $product_post['brand_id'] = 0;
         }
 
-        if ($request->brand_id && count($request->brand_id) > 0) {
-            $product->productBrands()->sync($request->brand_id);
-        }
+        $product->productBrands()->sync($request->brand_id);
 
         if (isset($request->home_section) && !empty($request->home_section)) {
             $data['Home_sections_ids'] = HomeSection::where('type', 4)->pluck('id')->toArray();
@@ -268,8 +266,8 @@ class ProductController extends AdminController{
 
     // fetch category products
     public function fetch_category_products(Category $category) {
-        $rows = Product::where('category_id', $category->id)->with('images', 'category')->get();
-        // dd($rows);
+        $rows = Product::where('category_id', $category->id)->with('images', 'category', 'mptions')->get();
+        
         $data = json_decode(($rows));
 
 
@@ -278,7 +276,9 @@ class ProductController extends AdminController{
 
     // fetch brand products
     public function fetch_brand_products(Brand $brand) {
-        $rows = Product::where('brand_id', $brand->id)->with('images', 'category')->get();
+        $rows = Product::whereHas('productBrands', function($q) use ($brand) {
+            $q->where('brands.id', $brand->id);
+        })->with('images', 'category', 'mptions')->get();
         $data = json_decode(($rows));
 
 

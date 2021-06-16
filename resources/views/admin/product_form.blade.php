@@ -564,6 +564,7 @@
                 var image = $('input[name="images[]"]').val(),
                     categorySelect = $("#category").val(),
                     subCategorySelect = $("#sub_category_select").val(),
+                    brandSelect = $(".brand").val(),
                     subCategory2Select = $("#sub_category_two").val(),
                     weightInput = $("input[name='weight']").val(),
                     numbersInput = $("input[name='numbers']").val(),
@@ -905,11 +906,12 @@
         
         var image = $('input[name="images[]"]').val(),
             categorySelect = $("#category").val(),
+            brandSelect = $(".brand").val(),
             subCategorySelect = $("#sub_category_select").val(),
             titleEnInput = $("input[name='title_en']").val(),
             titleArInput = $("input[name='title_ar']").val(),
             descriptionEnText = $('textarea[name="description_en"]').val(),
-            descriptionArText = $('textarea[name="description_ar"]').val()
+            descriptionArText = $('textarea[name="description_ar"]').val(),
             imagesRequired = "{{ __('messages.images_required') }}",
             categoryRequired = "{{ __('messages.category_required') }}",
             subCategoryRequired = "{{ __('messages.sub_category_required') }}",
