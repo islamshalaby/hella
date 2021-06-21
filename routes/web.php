@@ -323,6 +323,7 @@ Route::group([
     'prefix' => "webview"
 ] , function($router){
     Route::get('aboutapp/{lang}' , 'WebViewController@getabout');
+    Route::get('support' , 'WebViewController@support');
     Route::get('termsandconditions/{lang}' , 'WebViewController@gettermsandconditions' );
     Route::get('returnpolicy/{lang}' , 'WebViewController@returnpolicy');
     Route::get('deliveryinformation/{lang}' , 'WebViewController@deliveryinformation');

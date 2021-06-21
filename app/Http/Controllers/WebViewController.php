@@ -50,22 +50,25 @@ class WebViewController extends Controller
     }
 
     
-        // returnpolicy
-        public function deliveryinformation(Request $request){
+    // returnpolicy
+    public function deliveryinformation(Request $request){
 
-            $data['lang'] = $request->lang;
-            $setting = Setting::find(1);
-            if($data['lang'] == 'en' ){
-                $data['title'] = 'Delivery Information';
-                $data['text'] = $setting['delivery_information_en'];
-            }else{
-                $data['title'] = 'معلومات التوصيل';
-                $data['text'] = $setting['delivery_information_ar'];
-            }
-            return view('webview.termsandconditions' , $data);
-    
+        $data['lang'] = $request->lang;
+        $setting = Setting::find(1);
+        if($data['lang'] == 'en' ){
+            $data['title'] = 'Delivery Information';
+            $data['text'] = $setting['delivery_information_en'];
+        }else{
+            $data['title'] = 'معلومات التوصيل';
+            $data['text'] = $setting['delivery_information_ar'];
         }
-    
+        return view('webview.termsandconditions' , $data);
 
+    }
+    
+    // suuport
+    public function support() {
+        return view('webview.support');
+    }
 
 }
