@@ -205,7 +205,6 @@ var elms = "{{ $data['elms'] }}"
                     $("#categoriesList").parent(".form-group").show()
                     data.forEach(function(category) {
                         var categoryName = category.title_en
-
                         if (language == 'ar') {
                             categoryName = category.title_ar
                         }
@@ -282,7 +281,7 @@ var elms = "{{ $data['elms'] }}"
                             selected = "selected"
                         }
                         $("#offers_check").append(`
-                            <option ${selected} disabled value="${offer.id}" >${offerName}</option>
+                            <option ${selected} value="${offer.id}" >${offerName}</option>
                         `)
                     })
                     

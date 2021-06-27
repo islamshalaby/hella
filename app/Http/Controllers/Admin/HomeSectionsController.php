@@ -141,7 +141,7 @@ class HomeSectionsController extends AdminController{
     public function EditPost(Request $request, HomeSection $homeSection) {
         $post = $request->all();
         $home_section_post = $request->except('ads', 'ad', 'offers', 'categories', 'brands');
-
+        // dd($request->offers);
         $homeSection->update($home_section_post);
         $homeSection->homeElements()->delete();
         if (isset($post['ads']) && count($post['ads']) > 0) {
